@@ -1,0 +1,25 @@
+name: Yahoo monthly download
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "30 2 3 * *"
+permissions:
+  contents: read
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: yahoo_actions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r requirements.txt
+      - run: python download.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: yahoo-monthly-data
+          path: yahoo_actions/new_csv/
+          if-no-files-found: error

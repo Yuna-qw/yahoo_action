@@ -1,0 +1,5 @@
+__pycache__/
+*.py[cod]
+new_csv/
+failed_txt/
+QC_report_*.xlsx
