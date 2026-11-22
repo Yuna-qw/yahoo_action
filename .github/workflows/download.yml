@@ -2,7 +2,7 @@ name: Yahoo monthly download
 on:
   workflow_dispatch:
   schedule:
-    - cron: "30 2 3 * *"
+    - cron: "30 2 * * *"
 permissions:
   contents: read
 jobs:
@@ -14,8 +14,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: pip install -r requirements.txt
-      - run: python download.py
+      - id: scheduled-download
+        run: python run_scheduled.py
       - uses: actions/upload-artifact@v4
+        if: steps.scheduled-download.outputs.should_upload == 'true'
         with:
           name: yahoo-monthly-data
           path: new_csv/

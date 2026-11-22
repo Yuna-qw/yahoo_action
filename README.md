@@ -6,7 +6,7 @@ This folder contains a GitHub Actions ready version of the project's monthly Yah
 - `Snp500_Ru1000`
 - `TSX`
 
-The workflow runs on the 3rd of each month (UTC) and can also be started with **Actions → Yahoo monthly download → Run workflow**. Downloaded CSV files are stored as a workflow artifact named `yahoo-monthly-data`; they are not committed back to the repository.
+The workflow checks daily at 02:30 UTC. Change only `settings.json`'s `download_day_utc` value (1–28) to set the monthly download day. Scheduled runs download only on that UTC day. Manual runs through **Actions → Yahoo monthly download → Run workflow** start immediately. Downloaded CSV files are stored as a workflow artifact named `yahoo-monthly-data`; they are not committed back to the repository.
 
 ## Run locally
 
