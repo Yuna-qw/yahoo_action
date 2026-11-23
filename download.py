@@ -172,14 +172,14 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
 
     # 加载所有数据
     if data_option == 0:
-        data_Shanghai_Shenzhen = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name='Shanghai_Shenzhen', dtype='object', engine='openpyxl')
+        data_Shanghai_Shenzhen = pd.read_excel('master_full.xlsx', sheet_name='Shanghai_Shenzhen', dtype='object', engine='openpyxl')
         for i, row in data_Shanghai_Shenzhen.iterrows():
             data_dict['country'] = 'Shanghai_Shenzhen'
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
             data_dict['currently use'] = row['currently use']
             data.loc[i] = data_dict
         index = data.index[-1] + 1
-        data_Snp500_Ru1000 = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name='Snp500_Ru1000', dtype='object', engine='openpyxl')
+        data_Snp500_Ru1000 = pd.read_excel('master_full.xlsx', sheet_name='Snp500_Ru1000', dtype='object', engine='openpyxl')
         for i, row in data_Snp500_Ru1000.iterrows():
             data_dict['country'] = 'Snp500_Ru1000'
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
@@ -187,7 +187,7 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
             data.loc[index] = data_dict
             index += 1
 
-        data_TSX = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name='TSX', dtype='object', engine='openpyxl')
+        data_TSX = pd.read_excel('master_full.xlsx', sheet_name='TSX', dtype='object', engine='openpyxl')
         for i, row in data_TSX.iterrows():
             data_dict['country'] = 'TSX'
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
@@ -197,7 +197,7 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
     # 加载指定国家的数据
     else:
         sheetname = {1: 'Shanghai_Shenzhen', 2: 'Snp500_Ru1000', 3: 'TSX'}
-        data_chosen = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name=sheetname[data_option], dtype='object', engine='openpyxl')
+        data_chosen = pd.read_excel('master_full.xlsx', sheet_name=sheetname[data_option], dtype='object', engine='openpyxl')
         for i, row in data_chosen.iterrows():
             data_dict['country'] = sheetname[data_option]
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']

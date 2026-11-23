@@ -1,12 +1,12 @@
 # Yahoo Actions downloader
 
-This folder contains a GitHub Actions ready version of the project's monthly Yahoo Finance downloader. The bundled master workbook is a test fixture containing the first 10 rows marked `currently use = yes` from each market in the original master workbook:
+This folder contains a GitHub Actions ready version of the project's Yahoo Finance downloader. `master_full.xlsx` is the full master workbook, and the downloader selects stocks marked `currently use = yes` from these markets:
 
 - `Shanghai_Shenzhen`
 - `Snp500_Ru1000`
 - `TSX`
 
-The workflow checks daily at 02:30 UTC. Change only `settings.json`'s `download_day_utc` value (1–28) to set the monthly download day. Scheduled runs download only on that UTC day. Manual runs through **Actions → Yahoo monthly download → Run workflow** start immediately. Downloaded CSV files are stored as a workflow artifact named `yahoo-monthly-data`; they are not committed back to the repository.
+The GitHub Actions workflow is manual only. Choose **Actions → Yahoo monthly download → Run workflow** to download all master-list stocks marked `currently use = yes`. It then runs `check_download.py`, which checks CSV coverage, readability, and the latest month-end date. Downloaded CSV files and `check_report.csv` are stored as an artifact; they are not committed back to the repository. The original `qc.py` compares against historical CSV data, so it requires a baseline `csv/` dataset that is not included in this test repository.
 
 ## Run locally
 
