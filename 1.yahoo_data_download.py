@@ -12,6 +12,7 @@ from calendar import monthrange
 print(f"yfinance 版本: {yf.__version__}")
 
 fail_download = {'Shanghai_Shenzhen': [], 'Snp500_Ru1000': [], 'TSX': []}
+NEW_CSV_DIR = os.environ.get('YAHOO_NEW_CSV_DIR', 'new_csv')
 
 
 def downloader(ticker, data_name, start_date, end_date, sleep_time=1, repeat=3, option=None):
@@ -51,7 +52,8 @@ def downloader(ticker, data_name, start_date, end_date, sleep_time=1, repeat=3, 
                 else:
                     data = data.asfreq('ME', method='pad')  # 数据频度为每月（python环境3.11）
                     # data = data.asfreq('M', method='pad')    # 数据频度为每月（python环境3.7）
-                    data.to_csv(os.path.join('new_csv', str(data_name), f'{ticker}.csv'))
+                    os.makedirs(os.path.join(NEW_CSV_DIR, str(data_name)), exist_ok=True)
+                    data.to_csv(os.path.join(NEW_CSV_DIR, str(data_name), f'{ticker}.csv'))
                     print(ticker + ' Successful')
                 break
             except Exception as e:
@@ -141,8 +143,8 @@ def downloader(ticker, data_name, start_date, end_date, sleep_time=1, repeat=3, 
                 df_monthly = pd.DataFrame(monthly_rows)
                 df_monthly['Date'] = df_monthly['Date'].dt.strftime('%Y-%m-%d')
 
-                os.makedirs(os.path.join('new_csv', data_name), exist_ok=True)
-                filepath = os.path.join('new_csv', data_name, f"{ticker}.csv")
+                os.makedirs(os.path.join(NEW_CSV_DIR, data_name), exist_ok=True)
+                filepath = os.path.join(NEW_CSV_DIR, data_name, f"{ticker}.csv")
                 df_monthly.to_csv(filepath, index=False)
                 print(f"{ticker} requests API 下载成功。")
                 return  # 成功下载，退出
@@ -159,11 +161,11 @@ def downloader(ticker, data_name, start_date, end_date, sleep_time=1, repeat=3, 
 
 def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_option_method=None):
     # 新建文件夹
-    if not os.path.exists('new_csv'):
-        os.mkdir('new_csv')
+    if not os.path.exists(NEW_CSV_DIR):
+        os.makedirs(NEW_CSV_DIR, exist_ok=True)
     for country in ['Shanghai_Shenzhen', 'Snp500_Ru1000', 'TSX']:
-        if not os.path.exists(os.path.join('new_csv', country)):
-            os.mkdir(os.path.join('new_csv', country))
+        if not os.path.exists(os.path.join(NEW_CSV_DIR, country)):
+            os.makedirs(os.path.join(NEW_CSV_DIR, country), exist_ok=True)
 
     print("正在加载数据...")
     # data 将有三列: 'country', 'Yahoo_adj_Ticker_symbol', 'currently use'
@@ -172,14 +174,14 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
 
     # 加载所有数据
     if data_option == 0:
-        data_Shanghai_Shenzhen = pd.read_excel('master_full.xlsx', sheet_name='Shanghai_Shenzhen', dtype='object', engine='openpyxl')
+        data_Shanghai_Shenzhen = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name='Shanghai_Shenzhen', dtype='object', engine='openpyxl')
         for i, row in data_Shanghai_Shenzhen.iterrows():
             data_dict['country'] = 'Shanghai_Shenzhen'
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
             data_dict['currently use'] = row['currently use']
             data.loc[i] = data_dict
         index = data.index[-1] + 1
-        data_Snp500_Ru1000 = pd.read_excel('master_full.xlsx', sheet_name='Snp500_Ru1000', dtype='object', engine='openpyxl')
+        data_Snp500_Ru1000 = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name='Snp500_Ru1000', dtype='object', engine='openpyxl')
         for i, row in data_Snp500_Ru1000.iterrows():
             data_dict['country'] = 'Snp500_Ru1000'
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
@@ -187,7 +189,7 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
             data.loc[index] = data_dict
             index += 1
 
-        data_TSX = pd.read_excel('master_full.xlsx', sheet_name='TSX', dtype='object', engine='openpyxl')
+        data_TSX = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name='TSX', dtype='object', engine='openpyxl')
         for i, row in data_TSX.iterrows():
             data_dict['country'] = 'TSX'
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
@@ -197,7 +199,7 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
     # 加载指定国家的数据
     else:
         sheetname = {1: 'Shanghai_Shenzhen', 2: 'Snp500_Ru1000', 3: 'TSX'}
-        data_chosen = pd.read_excel('master_full.xlsx', sheet_name=sheetname[data_option], dtype='object', engine='openpyxl')
+        data_chosen = pd.read_excel('master_symbol_v1.6_2023.03.xlsx', sheet_name=sheetname[data_option], dtype='object', engine='openpyxl')
         for i, row in data_chosen.iterrows():
             data_dict['country'] = sheetname[data_option]
             data_dict['Yahoo_adj_Ticker_symbol'] = row['Yahoo_adj_Ticker_symbol']
@@ -231,7 +233,7 @@ def download(data_option=0, use_threads=1, sleep_time=1, repeat=1, download_opti
             if row['currently use'] != 'yes':
                 continue
             # 检查股票是否已下载，以及最后一个日期是否是上个月的月底
-            filename = os.path.join(os.getcwd(), (os.path.join('new_csv', str(data_name), f'{ticker}.csv')))
+            filename = os.path.join(NEW_CSV_DIR, str(data_name), f'{ticker}.csv')
             if os.path.exists(filename):
                 d = pd.read_csv(filename)
                 if not d.empty and d.iloc[-1, 0] == endDate:

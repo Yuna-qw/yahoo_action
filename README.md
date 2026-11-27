@@ -1,18 +1,11 @@
-# Yahoo Actions downloader
+# Yahoo data downloader
 
-This folder contains a GitHub Actions ready version of the project's Yahoo Finance downloader. `master_full.xlsx` is the full master workbook, and the downloader selects stocks marked `currently use = yes` from these markets:
+This directory keeps the original downloader filename and download logic. `run_download.py` reads `settings.json` and calls `1.yahoo_data_download.py` for all markets (`data_option=0`).
 
-- `Shanghai_Shenzhen`
-- `Snp500_Ru1000`
-- `TSX`
+Run `python run_download.py` whenever you want to start a full download. This is manual only; there is no configured run date or automatic schedule.
 
-The GitHub Actions workflow is manual only. Choose **Actions → Yahoo monthly download → Run workflow** to download all master-list stocks marked `currently use = yes`. It then runs `check_download.py`, which checks CSV coverage, readability, and the latest month-end date. Downloaded CSV files and `check_report.csv` are stored as an artifact; they are not committed back to the repository. The original `qc.py` compares against historical CSV data, so it requires a baseline `csv/` dataset that is not included in this test repository.
+The original script reads `master_symbol_v1.6_2023.03.xlsx` from this directory and writes CSV files to the configured `new_data_dir` (currently `/data/yahoo/new_csv`). Failures remain in `failed_txt/` under this code directory.
 
-## Run locally
+`settings.json` also records `old_data_dir` (`/data/yahoo/csv`) for the historical data baseline. The current one-command launcher only downloads; QC/check integration can use that path once its exact data layout is confirmed. The downloader parameters are `use_threads`, `sleep_time`, `repeat`, and `download_method`.
 
-```bash
-python -m pip install -r requirements.txt
-python download.py
-```
-
-The `qc.py`, `check.py`, and their small helper modules are included from the project's QC flow. These legacy QC scripts expect additional historical QC report spreadsheets and are not part of the scheduled download workflow.
+Install dependencies with `python -m pip install -r requirements.txt`.
